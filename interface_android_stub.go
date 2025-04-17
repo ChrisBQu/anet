@@ -7,7 +7,7 @@ import (
 	"errors"
 	"net"
 	"os"
-	"sync"a
+	"sync"
 	"syscall"
 	"time"
 	"unsafe"
@@ -163,39 +163,14 @@ type ipv6ZoneCache struct {
 	toName       map[int]string // interface index to its name
 }
 
-//go:linkname zoneCache net.zoneCache
-var zoneCache ipv6ZoneCache
+// ipv6ZoneCache stub for Android: no-op
+type ipv6ZoneCache struct{}
 
-//go:linkname zoneCacheX golang.org/x/net/internal/socket.zoneCache
-var zoneCacheX ipv6ZoneCache
+func (zc *ipv6ZoneCache) update(_ []net.Interface, _ bool) bool { return false }
 
-// update refreshes the network interface information if the cache was last
-// updated more than 1 minute ago, or if force is set. It reports whether the
-// cache was updated.
-func (zc *ipv6ZoneCache) update(ift []net.Interface, force bool) (updated bool) {
-	zc.Lock()
-	defer zc.Unlock()
-	now := time.Now()
-	if !force && zc.lastFetched.After(now.Add(-60*time.Second)) {
-		return false
-	}
-	zc.lastFetched = now
-	if len(ift) == 0 {
-		var err error
-		if ift, err = interfaceTable(0); err != nil {
-			return false
-		}
-	}
-	zc.toIndex = make(map[string]int, len(ift))
-	zc.toName = make(map[int]string, len(ift))
-	for _, ifi := range ift {
-		zc.toIndex[ifi.Name] = ifi.Index
-		if _, ok := zc.toName[ifi.Index]; !ok {
-			zc.toName[ifi.Index] = ifi.Name
-		}
-	}
-	return true
-}
+// these override the real linknames on Android
+var zoneCache = &ipv6ZoneCache{}
+var zoneCacheX = &ipv6ZoneCache{}
 
 // If the ifindex is zero, interfaceTable returns mappings of all
 // network interfaces. Otherwise it returns a mapping of a specific
