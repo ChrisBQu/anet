@@ -7,9 +7,7 @@ import (
 	"errors"
 	"net"
 	"os"
-	"sync"
 	"syscall"
-	"time"
 	"unsafe"
 )
 
