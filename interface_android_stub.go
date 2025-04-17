@@ -1,4 +1,4 @@
-//go:abuild android
+// +build android
 
 package anet
 
