@@ -150,19 +150,6 @@ func androidApiLevel() int {
 	return androidDeviceApiLevel()
 }
 
-// An ipv6ZoneCache represents a cache holding partial network
-// interface information. It is used for reducing the cost of IPv6
-// addressing scope zone resolution.
-//
-// Multiple names sharing the index are managed by first-come
-// first-served basis for consistency.
-type ipv6ZoneCache struct {
-	sync.RWMutex                // guard the following
-	lastFetched  time.Time      // last time routing information was fetched
-	toIndex      map[string]int // interface name to its index
-	toName       map[int]string // interface index to its name
-}
-
 // ipv6ZoneCache stub for Android: no-op
 type ipv6ZoneCache struct{}
 
